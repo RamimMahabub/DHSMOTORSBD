@@ -1,24 +1,13 @@
-/* Google Fonts */
-/* Use Inter for a clean, modern look */
-
 :root {
     --primary-color: #3b82f6;
-    /* Lighter blue */
     --primary-hover: #2563eb;
     --bg-color: #111827;
-    /* Dark gray */
     --card-bg: #1f2937;
-    /* Slightly lighter dark gray */
     --text-main: #f9fafb;
-    /* White-ish */
     --text-muted: #9ca3af;
-    /* Light gray */
     --border-color: #374151;
-    /* Dark border */
     --error-color: #f87171;
-    /* Light red */
     --success-color: #34d399;
-    /* Light green */
 }
 
 * {
@@ -93,7 +82,6 @@ body {
     background-color: var(--card-bg);
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    /* darkened shadow */
     overflow: hidden;
     border: 1px solid var(--border-color);
 }
@@ -149,11 +137,10 @@ select {
     transition: border-color 0.2s;
     outline: none;
     background-color: #374151;
-    /* Dark background for inputs */
+
     color: var(--text-main);
 }
 
-/* Ensure placeholder text is visible but muted */
 ::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
@@ -165,7 +152,6 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-/* Fix weird dark mode date picker styling in some browsers */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
@@ -235,7 +221,7 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* Admin panel styles */
+/* Admin panel */
 .admin-header {
     display: flex;
     justify-content: space-between;

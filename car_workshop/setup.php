@@ -1,7 +1,7 @@
 <?php
 $host = "sql102.infinityfree.com";
 $user = "if0_41287696";
-$pass = "XrT9wwQvNMbOGq"; // Replace with actual password
+$pass = "XrT9wwQvNMbOGq";
 $dbname = "if0_41287696_dhsmotors";
 
 // Create connection
@@ -10,17 +10,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// In InfinityFree, the database must be created manually via the Control Panel.
-// We just connect directly to it.
 
 $conn->select_db($dbname);
 
-// Drop existing tables to refresh schema
+
 $conn->query("DROP TABLE IF EXISTS appointments");
 $conn->query("DROP TABLE IF EXISTS admin_users");
 $conn->query("DROP TABLE IF EXISTS mechanics");
 
-// Create Mechanics table
+
 $sql = "CREATE TABLE IF NOT EXISTS mechanics (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL
@@ -31,7 +29,6 @@ if ($conn->query($sql) === TRUE) {
     echo "Error creating table: " . $conn->error . "<br>";
 }
 
-// Create Appointments table
 $sql = "CREATE TABLE IF NOT EXISTS appointments (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     client_name VARCHAR(100) NOT NULL,
@@ -49,7 +46,7 @@ if ($conn->query($sql) === TRUE) {
     echo "Error creating table: " . $conn->error . "<br>";
 }
 
-// Create Admin table
+
 $sql = "CREATE TABLE IF NOT EXISTS admin_users (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -61,7 +58,7 @@ if ($conn->query($sql) === TRUE) {
     echo "Error creating table: " . $conn->error . "<br>";
 }
 
-// Insert initial mechanics
+
 $mechanics = ['Rahim', 'Karim', 'Jamal', 'Kamal', 'Rafiq'];
 foreach ($mechanics as $mechanic) {
     $check = $conn->query("SELECT * FROM mechanics WHERE name='$mechanic'");
@@ -70,7 +67,7 @@ foreach ($mechanics as $mechanic) {
     }
 }
 
-// Insert admin user (password: admin123)
+// Insert admin user
 $admin_user = 'admin';
 $admin_pass = password_hash('admin123', PASSWORD_BCRYPT);
 $check = $conn->query("SELECT * FROM admin_users WHERE username='$admin_user'");

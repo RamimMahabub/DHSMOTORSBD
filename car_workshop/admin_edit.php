@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is logged in
+
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: admin_login.php");
     exit;
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Please select a date and a mechanic.";
         $messageType = "error";
     } else {
-        // Validation: Verify if the mechanic has free places on this date (excluding THIS appointment id)
+
         $MAX_APPOINTMENTS = 4;
         $check_mechanic_sql = "SELECT count(id) as total FROM appointments WHERE mechanic_id = $new_mechanic AND appointment_date = '$new_date' AND id != $id";
         $mechanic_result = $conn->query($check_mechanic_sql);
@@ -128,7 +128,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
                         <label for="mechanic_id">Change Mechanic</label>
                         <select id="mechanic_id" name="mechanic_id" required>
                             <option value="">-- Select a Mechanic --</option>
-                            <!-- Options will be populated by JS -->
+
                         </select>
                         <div id="mechanicHelp" class="help-text">Select a date to see available mechanics.</div>
                     </div>
@@ -139,7 +139,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
         </div>
     </div>
 
-    <!-- Reusing similar JS logic as the main booking page -->
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const dateInput = document.getElementById('appointment_date');
@@ -156,7 +156,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
                     return;
                 }
 
-                // We can pass appointment_id to exclude the current appointment from the count
+
                 fetch(`get_mechanics.php?date=${selectedDate}&exclude_id=${appointmentId}`)
                     .then(response => response.json())
                     .then(data => {
@@ -176,9 +176,6 @@ $current_mechanic_id = $appointment['mechanic_id'];
 
                             let freeSpaces = parseInt(mechanic.free_places);
 
-                            // If it's the currently assigned mechanic and same date, 
-                            // the free space might need adjustment if exclude_id logic isn't perfect, 
-                            // but get_mechanics.php will handle exclude_id.
 
                             if (freeSpaces > 0 || mechanic.id == currentMechanicId) {
                                 option.textContent = `${mechanic.name} (${freeSpaces} free places left)`;
@@ -188,7 +185,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
                                 option.disabled = true;
                             }
 
-                            // Pre-select if it matches
+
                             if (mechanic.id == currentMechanicId) {
                                 option.selected = true;
                             }
@@ -198,7 +195,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
 
                         if (availableCount === 0) {
                             mechanicHelp.innerHTML = '<span class="error">All mechanics are fully booked on this date.</span>';
-                            // Keep enabled so admin can change date
+
                         } else {
                             mechanicHelp.textContent = 'Choose an available mechanic.';
                             mechanicSelect.disabled = false;
@@ -206,7 +203,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
                     });
             }
 
-            // Trigger on load to populate current date's mechanics
+
             if (dateInput.value) {
                 fetchMechanics();
             }

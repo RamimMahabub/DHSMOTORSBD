@@ -16,10 +16,9 @@ if (isset($_GET['exclude_id']) && !empty($_GET['exclude_id'])) {
     $exclude_sql = " AND a.id != $exclude_id";
 }
 
-// Maximum 4 appointments per mechanic per day
 $MAX_APPOINTMENTS = 4;
 
-// Get all mechanics and their current appointment count on the specified date
+
 $sql = "
     SELECT 
         m.id, 

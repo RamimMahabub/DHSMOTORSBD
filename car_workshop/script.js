@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('appointmentForm');
     const dateInput = document.getElementById('appointment_date');
     const mechanicSelect = document.getElementById('mechanic_id');
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dateInput.setAttribute('min', today);
 
     // Fetch mechanics when date changes
-    dateInput.addEventListener('change', function() {
+    dateInput.addEventListener('change', function () {
         const selectedDate = this.value;
         if (!selectedDate) {
             mechanicSelect.innerHTML = '<option value="">-- Please select a date first --</option>';
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 mechanicSelect.innerHTML = '<option value="">-- Select a Mechanic --</option>';
-                
+
                 if (data.error) {
                     mechanicHelp.innerHTML = `<span class="error">${data.error}</span>`;
                     mechanicSelect.disabled = true;
@@ -30,13 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 let availableCount = 0;
-                
+
                 data.forEach(mechanic => {
                     const option = document.createElement('option');
                     option.value = mechanic.id;
-                    
+
                     const freeSpaces = parseInt(mechanic.free_places);
-                    
+
                     if (freeSpaces > 0) {
                         option.textContent = `${mechanic.name} (${freeSpaces} free places left)`;
                         availableCount++;
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.textContent = `${mechanic.name} (Fully booked)`;
                         option.disabled = true;
                     }
-                    
+
                     mechanicSelect.appendChild(option);
                 });
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form Validation
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         let isValid = true;
 
         // Reset errors

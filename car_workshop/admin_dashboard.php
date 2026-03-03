@@ -2,13 +2,13 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is logged in
+
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: admin_login.php");
     exit;
 }
 
-// Handle Logout
+
 if (isset($_GET['action']) && $_GET['action'] == 'logout') {
     session_destroy();
     header("Location: admin_login.php");
