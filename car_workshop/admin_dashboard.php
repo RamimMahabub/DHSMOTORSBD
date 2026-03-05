@@ -15,6 +15,46 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
     exit;
 }
 
+$DEFAULT_MAX_APPOINTMENTS = 4;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_space_allocation') {
+    $allocation_date = $conn->real_escape_string($_POST['allocation_date'] ?? '');
+    $mechanic_id = isset($_POST['allocation_mechanic_id']) ? (int) $_POST['allocation_mechanic_id'] : 0;
+    $max_spaces = isset($_POST['max_spaces']) ? (int) $_POST['max_spaces'] : -1;
+
+    if (empty($allocation_date) || $mechanic_id <= 0 || $max_spaces < 0) {
+        $_SESSION['message'] = "Please select date, mechanic and a valid max free spaces value.";
+        $_SESSION['messageType'] = "error";
+    } else {
+        $stmt = $conn->prepare("
+            INSERT INTO mechanic_space_allocations (mechanic_id, allocation_date, max_spaces)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE max_spaces = VALUES(max_spaces)
+        ");
+
+        if ($stmt) {
+            $stmt->bind_param("isi", $mechanic_id, $allocation_date, $max_spaces);
+            if ($stmt->execute()) {
+                $_SESSION['message'] = "Mechanic max free spaces updated for " . date('d M Y', strtotime($allocation_date)) . ".";
+                $_SESSION['messageType'] = "success";
+            } else {
+                $_SESSION['message'] = "Failed to update space allocation.";
+                $_SESSION['messageType'] = "error";
+            }
+            $stmt->close();
+        } else {
+            $_SESSION['message'] = "Unable to prepare allocation update.";
+            $_SESSION['messageType'] = "error";
+        }
+    }
+
+    header("Location: admin_dashboard.php");
+    exit;
+}
+
+$mechanics_sql = "SELECT id, name FROM mechanics ORDER BY name ASC";
+$mechanics_result = $conn->query($mechanics_sql);
+
 // Fetch appointments
 $sql = "
     SELECT 
@@ -68,6 +108,41 @@ $result = $conn->query($sql);
                         ?>
                     </div>
                 <?php endif; ?>
+
+                <div class="vehicle-box" style="margin-bottom: 2rem;">
+                    <h3>Mechanic Space Allocation</h3>
+                    <form method="POST" action="">
+                        <input type="hidden" name="action" value="save_space_allocation">
+                        <div class="form-group">
+                            <label for="allocation_date">Select Date</label>
+                            <input type="date" id="allocation_date" name="allocation_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="allocation_mechanic_id">Select Mechanic</label>
+                            <select id="allocation_mechanic_id" name="allocation_mechanic_id" required>
+                                <option value="">-- Select a Mechanic --</option>
+                                <?php if ($mechanics_result && $mechanics_result->num_rows > 0): ?>
+                                    <?php while ($mech = $mechanics_result->fetch_assoc()): ?>
+                                        <option value="<?php echo (int) $mech['id']; ?>">
+                                            <?php echo htmlspecialchars($mech['name']); ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="max_spaces">Max Free Spaces For Selected Day</label>
+                            <input type="number" id="max_spaces" name="max_spaces" min="0"
+                                value="<?php echo $DEFAULT_MAX_APPOINTMENTS; ?>" required>
+                            <div id="allocationHelp" class="help-text">Pick a date and mechanic to load current capacity.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn">Save Space Allocation</button>
+                    </form>
+                </div>
 
                 <h2>Appointment List</h2>
 
@@ -123,6 +198,48 @@ $result = $conn->query($sql);
             </footer>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dateInput = document.getElementById('allocation_date');
+            const mechanicSelect = document.getElementById('allocation_mechanic_id');
+            const maxSpacesInput = document.getElementById('max_spaces');
+            const allocationHelp = document.getElementById('allocationHelp');
+            const defaultMax = <?php echo (int) $DEFAULT_MAX_APPOINTMENTS; ?>;
+
+            function loadAllocation() {
+                const selectedDate = dateInput.value;
+                const selectedMechanic = mechanicSelect.value;
+
+                if (!selectedDate || !selectedMechanic) {
+                    maxSpacesInput.value = defaultMax;
+                    allocationHelp.textContent = 'Pick a date and mechanic to load current capacity.';
+                    return;
+                }
+
+                fetch(`get_space_allocation.php?date=${selectedDate}&mechanic_id=${selectedMechanic}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            allocationHelp.innerHTML = `<span class="error">${data.error}</span>`;
+                            maxSpacesInput.value = defaultMax;
+                            return;
+                        }
+
+                        maxSpacesInput.value = data.max_spaces;
+                        const sourceText = data.source === 'custom' ? 'custom' : 'default';
+                        allocationHelp.textContent = `Current ${sourceText} max: ${data.max_spaces}, booked: ${data.booked_spaces}, free: ${data.free_spaces}.`;
+                    })
+                    .catch(() => {
+                        allocationHelp.innerHTML = '<span class="error">Failed to load allocation info.</span>';
+                        maxSpacesInput.value = defaultMax;
+                    });
+            }
+
+            dateInput.addEventListener('change', loadAllocation);
+            mechanicSelect.addEventListener('change', loadAllocation);
+        });
+    </script>
 </body>
 
 </html>

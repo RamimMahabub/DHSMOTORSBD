@@ -57,38 +57,50 @@
                         <span class="error" id="phoneError"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label for="car_license_no">Car License Number <span class="required">*</span></label>
-                        <input type="text" id="car_license_no" name="car_license_no"
-                            placeholder="e.g. Dhaka Metro-Ga 12-3456" required>
-                        <span class="error" id="licenseError"></span>
+                    <div id="vehicles_container">
+                        <div class="vehicle-box" id="vehicle_box_1" data-index="1">
+                            <h3>Vehicle 1</h3>
+                            <div class="form-group">
+                                <label for="car_license_no_1">Car License Number <span class="required">*</span></label>
+                                <input type="text" id="car_license_no_1" name="car_license_no[]"
+                                    placeholder="e.g. Dhaka Metro-Ga 12-3456" required>
+                                <span class="error error-license"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="car_engine_no_1">Car Engine Number (Digits only) <span
+                                        class="required">*</span></label>
+                                <input type="text" id="car_engine_no_1" name="car_engine_no[]"
+                                    placeholder="e.g. 987654321" required>
+                                <span class="error error-engine"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="appointment_date_1">Appointment Date <span class="required">*</span></label>
+                                <input type="date" id="appointment_date_1" name="appointment_date[]"
+                                    class="appointment-date" required>
+                                <span class="error error-date"></span>
+                            </div>
+
+                            <div class="form-group mb-0">
+                                <label for="mechanic_id_1">Select Mechanic <span class="required">*</span></label>
+                                <select id="mechanic_id_1" name="mechanic_id[]" class="mechanic-select" required
+                                    disabled>
+                                    <option value="">-- Please select a date first --</option>
+                                </select>
+                                <div class="help-text help-mechanic">Choose a date to see available mechanics. Limits
+                                    can vary by mechanic and date.</div>
+                                <span class="error error-mechanic"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="car_engine_no">Car Engine Number (Digits only) <span
-                                class="required">*</span></label>
-                        <input type="text" id="car_engine_no" name="car_engine_no" placeholder="e.g. 987654321"
-                            required>
-                        <span class="error" id="engineError"></span>
+                    <div class="form-group" style="text-align: right;">
+                        <button type="button" id="add_vehicle_btn" class="btn btn-secondary"
+                            style="display: inline-block; width: auto; padding: 0.5rem 1rem;">+ Add Another Car</button>
                     </div>
 
-                    <div class="form-group">
-                        <label for="appointment_date">Appointment Date <span class="required">*</span></label>
-                        <input type="date" id="appointment_date" name="appointment_date" required>
-                        <span class="error" id="dateError"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="mechanic_id">Select Mechanic <span class="required">*</span></label>
-                        <select id="mechanic_id" name="mechanic_id" required disabled>
-                            <option value="">-- Please select a date first --</option>
-                        </select>
-                        <div id="mechanicHelp" class="help-text">Choose a date to see available mechanics. Max 4
-                            appointments per mechanic.</div>
-                        <span class="error" id="mechanicError"></span>
-                    </div>
-
-                    <button type="submit" class="btn" id="submitBtn">Book Appointment</button>
+                    <button type="submit" class="btn" id="submitBtn">Book Appointment(s)</button>
                 </form>
                 <div id="formMessage"></div>
             </div>

@@ -16,6 +16,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $id = (int) $_GET['id'];
 $message = '';
 $messageType = '';
+$DEFAULT_MAX_APPOINTMENTS = 4;
 
 // Handle Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,12 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $messageType = "error";
     } else {
 
-        $MAX_APPOINTMENTS = 4;
+        $max_spaces_sql = "SELECT max_spaces FROM mechanic_space_allocations WHERE mechanic_id = $new_mechanic AND allocation_date = '$new_date' LIMIT 1";
+        $max_spaces_result = $conn->query($max_spaces_sql);
+        $max_spaces_for_day = $DEFAULT_MAX_APPOINTMENTS;
+        if ($max_spaces_result && $max_spaces_result->num_rows > 0) {
+            $max_row = $max_spaces_result->fetch_assoc();
+            $max_spaces_for_day = max(0, (int) $max_row['max_spaces']);
+        }
+
         $check_mechanic_sql = "SELECT count(id) as total FROM appointments WHERE mechanic_id = $new_mechanic AND appointment_date = '$new_date' AND id != $id";
         $mechanic_result = $conn->query($check_mechanic_sql);
         $row = $mechanic_result->fetch_assoc();
 
-        if ($row['total'] >= $MAX_APPOINTMENTS) {
+        if ($row['total'] >= $max_spaces_for_day) {
             $message = "The selected mechanic is fully booked on this new date. Please choose another one.";
             $messageType = "error";
         } else {
@@ -146,7 +154,6 @@ $current_mechanic_id = $appointment['mechanic_id'];
             const mechanicSelect = document.getElementById('mechanic_id');
             const mechanicHelp = document.getElementById('mechanicHelp');
             const currentMechanicId = "<?php echo $current_mechanic_id; ?>";
-            const appointmentId = "<?php echo $id; ?>";
 
             function fetchMechanics() {
                 const selectedDate = dateInput.value;
@@ -157,7 +164,7 @@ $current_mechanic_id = $appointment['mechanic_id'];
                 }
 
 
-                fetch(`get_mechanics.php?date=${selectedDate}&exclude_id=${appointmentId}`)
+                fetch(`get_mechanics.php?date=${selectedDate}`)
                     .then(response => response.json())
                     .then(data => {
                         mechanicSelect.innerHTML = '<option value="">-- Select a Mechanic --</option>';

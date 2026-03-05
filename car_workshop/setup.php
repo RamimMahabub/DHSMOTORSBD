@@ -15,6 +15,7 @@ $conn->select_db($dbname);
 
 
 $conn->query("DROP TABLE IF EXISTS appointments");
+$conn->query("DROP TABLE IF EXISTS mechanic_space_allocations");
 $conn->query("DROP TABLE IF EXISTS admin_users");
 $conn->query("DROP TABLE IF EXISTS mechanics");
 
@@ -46,6 +47,20 @@ if ($conn->query($sql) === TRUE) {
     echo "Error creating table: " . $conn->error . "<br>";
 }
 
+$sql = "CREATE TABLE IF NOT EXISTS mechanic_space_allocations (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    mechanic_id INT(6) UNSIGNED NOT NULL,
+    allocation_date DATE NOT NULL,
+    max_spaces INT NOT NULL DEFAULT 4,
+    UNIQUE KEY uniq_mechanic_day (mechanic_id, allocation_date),
+    FOREIGN KEY (mechanic_id) REFERENCES mechanics(id) ON DELETE CASCADE
+)";
+if ($conn->query($sql) === TRUE) {
+    echo "Table 'mechanic_space_allocations' created successfully<br>";
+} else {
+    echo "Error creating table: " . $conn->error . "<br>";
+}
+
 
 $sql = "CREATE TABLE IF NOT EXISTS admin_users (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -67,7 +82,7 @@ foreach ($mechanics as $mechanic) {
     }
 }
 
-// Insert admin user
+//admin user
 $admin_user = 'admin';
 $admin_pass = password_hash('admin123', PASSWORD_BCRYPT);
 $check = $conn->query("SELECT * FROM admin_users WHERE username='$admin_user'");
